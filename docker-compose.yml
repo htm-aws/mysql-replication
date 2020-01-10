@@ -1,0 +1,34 @@
+version: '3'
+services:
+  mysql_master:
+    image: mysql:5.7
+    command: --server-id=1 --log-bin='mysql-bin-1.log'
+    volumes:
+      - ./master/data:/var/lib/mysql
+    restart: always
+    ports:
+      - "3308:3306"
+    container_name: "mysql_master"
+    environment:
+      MYSQL_ROOT_PASSWORD: mypass
+    networks:
+      - my_network_replication
+
+  mysql_slave1:
+    depends_on:
+      - mysql_master
+    image: mysql:5.7
+    command: --server-id=2
+    volumes:
+      - ./slave/data1:/var/lib/mysql
+    restart: always
+    container_name: "mysql_slave1"
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mypass
+    networks:
+      - my_network_replication
+
+networks:
+  my_network_replication:
